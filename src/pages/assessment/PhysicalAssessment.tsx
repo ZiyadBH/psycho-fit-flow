@@ -18,11 +18,9 @@ const PhysicalAssessment = () => {
     gender: "",
     weight: "",
     height: "",
-    workNature: "",
-    workoutDays: "",
-    fitnessLevel: "",
-    diet: "",
-    allergies: "",
+    Goal: "",
+    AvailableTrainingDays: "",
+    ExperienceLevel: "",
   });
 
   const bmi = useMemo(() => {
@@ -44,14 +42,14 @@ const PhysicalAssessment = () => {
   const sections = [
     { title: "Basic Information", description: "Tell us about yourself" },
     { title: "Current Activity", description: "Your fitness habits" },
-    { title: "Nutrition", description: "Your dietary preferences" },
+    
   ];
 
   const handleNext = () => {
     if (currentSection < sections.length - 1) {
       setCurrentSection(currentSection + 1);
     } else {
-      navigate("/assessment/preferences");
+      navigate("/assessment/results");
     }
   };
 
@@ -64,13 +62,23 @@ const PhysicalAssessment = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    let value = e.target.value;
+    
+    // Reject negative values for age, weight, and height
+    if (["age", "weight", "height"].includes(e.target.name)) {
+      const numValue = parseFloat(value);
+      if (value && numValue < 0) {
+        return; // Ignore negative input
+      }
+    }
+    
     setResponses((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]: value,
     }));
   };
 
-  const progress = 25 + ((currentSection + 1) / 4) * 25;
+  const progress = 50 + ((currentSection + 1) / 2) * 50;
 
   return (
     <div className="min-h-screen bg-background">
@@ -83,10 +91,10 @@ const PhysicalAssessment = () => {
                 <Brain className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold text-foreground">
-                Psycho<span className="text-primary">Fitness</span>
+                Psy<span className="text-primary">Fit</span>
               </span>
             </div>
-            <span className="text-sm text-muted-foreground">Step 2 of 4</span>
+            <span className="text-sm text-muted-foreground">Step 2 of 2</span>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
@@ -121,6 +129,7 @@ const PhysicalAssessment = () => {
                     placeholder="Your age"
                     value={responses.age}
                     onChange={handleChange}
+                    min="0"
                     className="h-12"
                   />
                 </div>
@@ -158,6 +167,7 @@ const PhysicalAssessment = () => {
                     placeholder="Your weight"
                     value={responses.weight}
                     onChange={handleChange}
+                    min="0"
                     className="h-12"
                   />
                 </div>
@@ -170,6 +180,7 @@ const PhysicalAssessment = () => {
                     placeholder="Your height"
                     value={responses.height}
                     onChange={handleChange}
+                    min="0"
                     className="h-12"
                   />
                 </div>
@@ -200,25 +211,25 @@ const PhysicalAssessment = () => {
           {currentSection === 1 && (
             <div className="space-y-8">
               <div className="space-y-4">
-                <Label className="text-base font-semibold">Nature of work</Label>
+                <Label className="text-base font-semibold">What is your primary goal ?</Label>
                 <RadioGroup
-                  value={responses.workNature}
+                  value={responses.Goal}
                   onValueChange={(value) =>
-                    setResponses((prev) => ({ ...prev, workNature: value }))
+                    setResponses((prev) => ({ ...prev, Goal: value }))
                   }
                   className="space-y-3"
                 >
                   {[
-                    { value: "office", label: "Office (Sedentary)" },
-                    { value: "standing", label: "Standing (Moderate activity)" },
-                    { value: "physical", label: "Physical (Active work)" },
+                    { value: "0", label: "Improve general fitness" },
+                    { value: "1", label: "Build muscle (Bulking)" },
+                    { value: "2", label: "Lose weight (Cutting)" },
                   ].map((option) => (
                     <div
                       key={option.value}
                       className="flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
                     >
-                      <RadioGroupItem value={option.value} id={option.value} />
-                      <Label htmlFor={option.value} className="cursor-pointer flex-1">
+                      <RadioGroupItem value={option.value} id={`goal-${option.value}`} />
+                      <Label htmlFor={`goal-${option.value}`} className="cursor-pointer flex-1">
                         {option.label}
                       </Label>
                     </div>
@@ -228,30 +239,33 @@ const PhysicalAssessment = () => {
 
               <div className="space-y-4">
                 <Label className="text-base font-semibold">
-                  Number of workout days per week
+                  Available Training Days
                 </Label>
                 <RadioGroup
-                  value={responses.workoutDays}
+                  value={responses.AvailableTrainingDays}
                   onValueChange={(value) =>
-                    setResponses((prev) => ({ ...prev, workoutDays: value }))
+                    setResponses((prev) => ({ ...prev, AvailableTrainingDays: value }))
                   }
                   className="grid grid-cols-4 gap-3"
                 >
-                  {["0", "1-2", "3-4", "5+"].map((option) => (
+                  {[
+                    { value: "3", label: "2-3" },
+                    { value: "4", label: "4" },
+                    { value: "6", label: "5-6" },
+                  ].map((option) => (
                     <div
-                      key={option}
-                      className="flex items-center justify-center p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
+                      key={option.value}
+                      className="flex items-center justify-center p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors"
                     >
                       <RadioGroupItem
-                        value={option}
-                        id={`days-${option}`}
-                        className="sr-only"
+                        value={option.value}
+                        id={`days-${option.value}`}
                       />
                       <Label
-                        htmlFor={`days-${option}`}
-                        className="cursor-pointer font-semibold"
+                        htmlFor={`days-${option.value}`}
+                        className="cursor-pointer font-semibold ml-2"
                       >
-                        {option}
+                        {option.label}
                       </Label>
                     </div>
                   ))}
@@ -259,27 +273,26 @@ const PhysicalAssessment = () => {
               </div>
 
               <div className="space-y-4">
-                <Label className="text-base font-semibold">Your fitness level</Label>
+                <Label className="text-base font-semibold">Experience Level</Label>
                 <RadioGroup
-                  value={responses.fitnessLevel}
+                  value={responses.ExperienceLevel}
                   onValueChange={(value) =>
-                    setResponses((prev) => ({ ...prev, fitnessLevel: value }))
+                    setResponses((prev) => ({ ...prev, ExperienceLevel: value }))
                   }
                   className="space-y-3"
                 >
                   {[
-                    "Complete beginner",
-                    "Beginner",
-                    "Intermediate",
-                    "Advanced",
-                  ].map((level) => (
+                    { value: "0", label: "Beginner (0–6 months)" },
+                    { value: "1", label: "Intermediate (6–24 months)" },
+                    { value: "2", label: "Advanced (2+ years)" },
+                  ].map((option) => (
                     <div
-                      key={level}
+                      key={option.value}
                       className="flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
                     >
-                      <RadioGroupItem value={level} id={level} />
-                      <Label htmlFor={level} className="cursor-pointer flex-1">
-                        {level}
+                      <RadioGroupItem value={option.value} id={`level-${option.value}`} />
+                      <Label htmlFor={`level-${option.value}`} className="cursor-pointer flex-1">
+                        {option.label}
                       </Label>
                     </div>
                   ))}
@@ -288,53 +301,7 @@ const PhysicalAssessment = () => {
             </div>
           )}
 
-          {currentSection === 2 && (
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <Label className="text-base font-semibold">Your diet</Label>
-                <RadioGroup
-                  value={responses.diet}
-                  onValueChange={(value) =>
-                    setResponses((prev) => ({ ...prev, diet: value }))
-                  }
-                  className="space-y-3"
-                >
-                  {[
-                    "Regular (no restrictions)",
-                    "Vegetarian",
-                    "Keto",
-                    "Healthy balanced",
-                    "No specific diet",
-                  ].map((diet) => (
-                    <div
-                      key={diet}
-                      className="flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
-                    >
-                      <RadioGroupItem value={diet} id={diet} />
-                      <Label htmlFor={diet} className="cursor-pointer flex-1">
-                        {diet}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-
-              <div className="space-y-4">
-                <Label htmlFor="allergies" className="text-base font-semibold">
-                  Do you have any allergies or dietary restrictions?
-                </Label>
-                <Textarea
-                  id="allergies"
-                  name="allergies"
-                  placeholder="E.g., gluten intolerance, nut allergy, lactose intolerant..."
-                  value={responses.allergies}
-                  onChange={handleChange}
-                  rows={4}
-                  className="resize-none"
-                />
-              </div>
-            </div>
-          )}
+          
         </motion.div>
       </div>
 
@@ -347,7 +314,7 @@ const PhysicalAssessment = () => {
               Previous
             </Button>
             <Button variant="hero" onClick={handleNext}>
-              {currentSection === sections.length - 1 ? "Continue" : "Next"}
+              {currentSection === sections.length - 1 ? "View my Results" : "Next"}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>

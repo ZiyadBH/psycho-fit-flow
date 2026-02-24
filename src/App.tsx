@@ -3,16 +3,15 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
+import Index from "./pages/dashboard/Index";
+import Auth from "./pages/dashboard/Auth";
 import PsychologicalAssessment from "./pages/assessment/PsychologicalAssessment";
 import PhysicalAssessment from "./pages/assessment/PhysicalAssessment";
-import PreferencesAssessment from "./pages/assessment/PreferencesAssessment";
 import AssessmentResults from "./pages/assessment/AssessmentResults";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/dashboard/Dashboard";
 import MoodTracker from "./pages/dashboard/MoodTracker";
 import Chatbot from "./pages/dashboard/Chatbot";
-import NotFound from "./pages/NotFound";
+import NotFound from "./pages/dashboard/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -27,7 +26,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/assessment/psychological" element={<PsychologicalAssessment />} />
           <Route path="/assessment/physical" element={<PhysicalAssessment />} />
-          <Route path="/assessment/preferences" element={<PreferencesAssessment />} />
+          {/* Preferences assessment removed; flow is Psychological -> Physical -> Results */}
           <Route path="/assessment/results" element={<AssessmentResults />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/mood" element={<MoodTracker />} />

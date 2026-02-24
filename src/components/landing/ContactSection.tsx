@@ -48,7 +48,7 @@ const ContactSection = () => {
               Get in Touch
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Have questions about PsychoFitness? We'd love to hear from you.
+              Have questions about PsyFit? We'd love to hear from you.
             </p>
           </motion.div>
 
@@ -67,7 +67,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Email Us</h3>
-                  <p className="text-muted-foreground">support@psychofitness.com</p>
+                  <p className="text-muted-foreground">support@psyfit.com</p>
                 </div>
               </div>
               

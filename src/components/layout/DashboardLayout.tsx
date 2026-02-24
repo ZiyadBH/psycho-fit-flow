@@ -46,7 +46,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               <Brain className="w-4 h-4 text-primary-foreground" />
             </div>
             <span className="text-lg font-bold text-foreground">
-              Psycho<span className="text-primary">Fitness</span>
+              Psy<span className="text-primary">Fit</span>
             </span>
           </Link>
           <button
@@ -80,7 +80,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 <Brain className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold text-foreground">
-                Psycho<span className="text-primary">Fitness</span>
+                Psy<span className="text-primary">Fit</span>
               </span>
             </Link>
           </div>

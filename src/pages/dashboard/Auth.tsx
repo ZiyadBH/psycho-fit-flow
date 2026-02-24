@@ -84,7 +84,7 @@ const Auth = () => {
               <Brain className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="text-2xl font-bold text-foreground">
-              Psycho<span className="text-primary">Fitness</span>
+              Psy<span className="text-primary">Fit</span>
             </span>
           </div>
 

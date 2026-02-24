@@ -13,7 +13,7 @@ const Footer = () => {
                 <Brain className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold">
-                Psycho<span className="text-primary">Fitness</span>
+                Psy<span className="text-primary">Fit</span>
               </span>
             </Link>
             <p className="text-background/70 max-w-sm">
@@ -65,7 +65,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="border-t border-background/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-background/60 text-sm">
-            © {new Date().getFullYear()} PsychoFitness. All rights reserved.
+            © {new Date().getFullYear()} PsyFit. All rights reserved.
           </p>
           <p className="text-background/60 text-sm flex items-center gap-1">
             Made with <Heart className="w-4 h-4 text-destructive fill-destructive" /> for your wellness

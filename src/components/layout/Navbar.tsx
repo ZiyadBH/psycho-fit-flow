@@ -27,7 +27,7 @@ const Navbar = () => {
               <Brain className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold text-foreground">
-              Psycho<span className="text-primary">Fitness</span>
+              Psy<span className="text-primary">Fit</span>
             </span>
           </Link>
 

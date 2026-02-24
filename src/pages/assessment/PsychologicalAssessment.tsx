@@ -16,8 +16,9 @@ const PsychologicalAssessment = () => {
   const [responses, setResponses] = useState({
     EnergyLevel: "",
     MotivationLevel : "",
-    stressLevel: [2],
+    stressLevel: [1],
     PersonalityPreference: "",
+    Discipline: "",
   });
 
   const sections = [
@@ -28,10 +29,6 @@ const PsychologicalAssessment = () => {
     {
       title: "Current Psychological State",
       description: "Tell us how you're feeling right now",
-    },
-    {
-      title: "Habits and Challenges",
-      description: "Let's identify what's holding you back",
     },
   ];
 
@@ -52,7 +49,7 @@ const PsychologicalAssessment = () => {
   };
 
 
-  const progress = ((currentSection + 1) / 4) * 25;
+  const progress = ((currentSection + 1) / 2) * 50;
 
   return (
     <div className="min-h-screen bg-background">
@@ -65,7 +62,7 @@ const PsychologicalAssessment = () => {
                 <Brain className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold text-foreground">
-                Psycho<span className="text-primary">Fitness</span>
+                Psy<span className="text-primary">Fit</span>
               </span>
             </div>
             <span className="text-sm text-muted-foreground">Step 1 of 2</span>
@@ -106,17 +103,17 @@ const PsychologicalAssessment = () => {
                   className="space-y-3"
                 >
                   {[
-                    "Low",
-                    "Moderate",
-                    "High",
-                  ].map((enrgy) => (
+                    { value: "0", label: "Low" },
+                    { value: "1", label: "Moderate" },
+                    { value: "2", label: "High" },
+                  ].map((option) => (
                     <div
-                      key={enrgy}
+                      key={option.value}
                       className="flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
                     >
-                      <RadioGroupItem value={enrgy} id={enrgy} />
-                      <Label htmlFor={enrgy} className="cursor-pointer flex-1">
-                        {enrgy}
+                      <RadioGroupItem value={option.value} id={`energy-${option.value}`} />
+                      <Label htmlFor={`energy-${option.value}`} className="cursor-pointer flex-1">
+                        {option.label}
                       </Label>
                     </div>
                   ))}
@@ -136,16 +133,16 @@ const PsychologicalAssessment = () => {
                   className="space-y-3"
                 >
                   {[
-                    { value: "Low",  label: "Low motivation" },
-                    { value: "Medium", label: "Medium motivation" },
-                    { value: "High", label: "High motivation" },
+                    { value: "0",  label: "Low motivation" },
+                    { value: "1", label: "Medium motivation" },
+                    { value: "2", label: "High motivation" },
                   ].map((option) => (
                     <div
                       key={option.value}
                       className="flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
                     >
-                      <RadioGroupItem value={option.value} id={option.value} />
-                      <Label htmlFor={option.value} className="cursor-pointer flex-1">
+                      <RadioGroupItem value={option.value} id={`motivation-${option.value}`} />
+                      <Label htmlFor={`motivation-${option.value}`} className="cursor-pointer flex-1">
                         {option.label}
                       </Label>
                     </div>
@@ -164,7 +161,7 @@ const PsychologicalAssessment = () => {
                     What is your current stress level?
                   </Label>
                   <span className="text-2xl font-bold text-primary">
-                    {responses.stressLevel[0]}/3
+                    {responses.stressLevel[0]}/2
                   </span>
                 </div>
                 <Slider
@@ -172,8 +169,8 @@ const PsychologicalAssessment = () => {
                   onValueChange={(value) =>
                     setResponses((prev) => ({ ...prev, stressLevel: value }))
                   }
-                  min={1}
-                  max={3}
+                  min={0}
+                  max={2}
                   step={1}
                   className="py-4"
                 />
@@ -195,19 +192,50 @@ const PsychologicalAssessment = () => {
                   }
                   className="grid grid-cols-2 gap-3"
                 >
-                  {["I prefer training alone", "I enjoy social or group training",].map(
-                    (PersonalityP) => (
-                      <div
-                        key={PersonalityP}
-                        className="flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
-                      >
-                        <RadioGroupItem value={PersonalityP} id={PersonalityP} />
-                        <Label htmlFor={PersonalityP} className="cursor-pointer">
-                          {PersonalityP}
-                        </Label>
-                      </div>
-                    )
-                  )}
+                  {[
+                    { value: "0", label: "I prefer training alone" },
+                    { value: "1", label: "I enjoy social or group training" },
+                  ].map((option) => (
+                    <div
+                      key={option.value}
+                      className="flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
+                    >
+                      <RadioGroupItem value={option.value} id={`personality-${option.value}`} />
+                      <Label htmlFor={`personality-${option.value}`} className="cursor-pointer">
+                        {option.label}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+
+              {/* Discipline */}
+              <div className="space-y-4">
+                <Label className="text-base font-semibold">
+                  How disciplined are you with routines?
+                </Label>
+                <RadioGroup
+                  value={responses.Discipline}
+                  onValueChange={(value) =>
+                    setResponses((prev) => ({ ...prev, Discipline: value }))
+                  }
+                  className="space-y-3"
+                >
+                  {[
+                    { value: "0", label: "I struggle to stay consistent" },
+                    { value: "1", label: "I try but sometimes fail" },
+                    { value: "2", label: "I stay consistent most of the time" },
+                  ].map((option) => (
+                    <div
+                      key={option.value}
+                      className="flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
+                    >
+                      <RadioGroupItem value={option.value} id={`discipline-${option.value}`} />
+                      <Label htmlFor={`discipline-${option.value}`} className="cursor-pointer flex-1">
+                        {option.label}
+                      </Label>
+                    </div>
+                  ))}
                 </RadioGroup>
               </div>
             </div>

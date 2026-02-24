@@ -2,16 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import {
-  Brain,
-  Dumbbell,
-  Heart,
-  Utensils,
-  Play,
-  Calendar,
-  CheckCircle2,
-  Sparkles,
-} from "lucide-react";
+import { Brain,Dumbbell,Heart,Utensils,Play,Calendar,CheckCircle2,Sparkles,} from "lucide-react";
 
 const AssessmentResults = () => {
   const navigate = useNavigate();
@@ -60,10 +51,10 @@ const AssessmentResults = () => {
                 <Brain className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold text-foreground">
-                Psycho<span className="text-primary">Fitness</span>
+                Psy<span className="text-primary">Fit</span>
               </span>
             </div>
-            <span className="text-sm text-muted-foreground">Step 4 of 4</span>
+            <span className="text-sm text-muted-foreground">Assessment Complete</span>
           </div>
           <Progress value={100} className="h-2" />
         </div>
