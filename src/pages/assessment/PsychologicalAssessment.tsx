@@ -14,14 +14,10 @@ const PsychologicalAssessment = () => {
   const [currentSection, setCurrentSection] = useState(0);
 
   const [responses, setResponses] = useState({
-    mainGoal: "",
-    motivation: "",
-    stressLevel: [5],
-    moodLevel: [5],
-    sleepHours: "",
-    challenges: [] as string[],
-    hasActivity: "",
-    activityFrequency: "",
+    EnergyLevel: "",
+    MotivationLevel : "",
+    stressLevel: [2],
+    PersonalityPreference: "",
   });
 
   const sections = [
@@ -55,14 +51,6 @@ const PsychologicalAssessment = () => {
     }
   };
 
-  const handleChallengeToggle = (challenge: string) => {
-    setResponses((prev) => ({
-      ...prev,
-      challenges: prev.challenges.includes(challenge)
-        ? prev.challenges.filter((c) => c !== challenge)
-        : [...prev.challenges, challenge],
-    }));
-  };
 
   const progress = ((currentSection + 1) / 4) * 25;
 
@@ -80,7 +68,7 @@ const PsychologicalAssessment = () => {
                 Psycho<span className="text-primary">Fitness</span>
               </span>
             </div>
-            <span className="text-sm text-muted-foreground">Step 1 of 4</span>
+            <span className="text-sm text-muted-foreground">Step 1 of 2</span>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
@@ -97,40 +85,38 @@ const PsychologicalAssessment = () => {
           className="max-w-2xl mx-auto"
         >
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Your Psychological Assessment
+            Psychological Features
           </h1>
-          <p className="text-lg text-muted-foreground mb-8">
-            {sections[currentSection].title}: {sections[currentSection].description}
+          <p className="text-muted-foreground mb-8">
+              Let's start by understanding your current energy levels and what motivates you.
           </p>
 
           {currentSection === 0 && (
             <div className="space-y-8">
-              {/* Main Goal */}
+              {/* Energy Level */}
               <div className="space-y-4">
                 <Label className="text-base font-semibold">
-                  What is your main goal?
+                  How would you describe your current energy level ?
                 </Label>
                 <RadioGroup
-                  value={responses.mainGoal}
+                  value={responses.EnergyLevel}
                   onValueChange={(value) =>
-                    setResponses((prev) => ({ ...prev, mainGoal: value }))
+                    setResponses((prev) => ({ ...prev, EnergyLevel: value }))
                   }
                   className="space-y-3"
                 >
                   {[
-                    "Improve mood and reduce stress",
-                    "Lose weight",
-                    "Build muscle",
-                    "Improve general fitness",
-                    "Improve sleep",
-                  ].map((goal) => (
+                    "Low",
+                    "Moderate",
+                    "High",
+                  ].map((enrgy) => (
                     <div
-                      key={goal}
+                      key={enrgy}
                       className="flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
                     >
-                      <RadioGroupItem value={goal} id={goal} />
-                      <Label htmlFor={goal} className="cursor-pointer flex-1">
-                        {goal}
+                      <RadioGroupItem value={enrgy} id={enrgy} />
+                      <Label htmlFor={enrgy} className="cursor-pointer flex-1">
+                        {enrgy}
                       </Label>
                     </div>
                   ))}
@@ -143,17 +129,16 @@ const PsychologicalAssessment = () => {
                   What is your primary motivation?
                 </Label>
                 <RadioGroup
-                  value={responses.motivation}
+                  value={responses.MotivationLevel}
                   onValueChange={(value) =>
-                    setResponses((prev) => ({ ...prev, motivation: value }))
+                    setResponses((prev) => ({ ...prev, MotivationLevel: value }))
                   }
                   className="space-y-3"
                 >
                   {[
-                    { value: "internal", label: "Better health (internal motivation)" },
-                    { value: "external", label: "Better appearance (external motivation)" },
-                    { value: "social", label: "Social pressure" },
-                    { value: "medical", label: "Medical advice" },
+                    { value: "Low",  label: "Low motivation" },
+                    { value: "Medium", label: "Medium motivation" },
+                    { value: "High", label: "High motivation" },
                   ].map((option) => (
                     <div
                       key={option.value}
@@ -176,10 +161,10 @@ const PsychologicalAssessment = () => {
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <Label className="text-base font-semibold">
-                    How would you rate your stress level today?
+                    What is your current stress level?
                   </Label>
                   <span className="text-2xl font-bold text-primary">
-                    {responses.stressLevel[0]}/10
+                    {responses.stressLevel[0]}/3
                   </span>
                 </div>
                 <Slider
@@ -188,7 +173,7 @@ const PsychologicalAssessment = () => {
                     setResponses((prev) => ({ ...prev, stressLevel: value }))
                   }
                   min={1}
-                  max={10}
+                  max={3}
                   step={1}
                   className="py-4"
                 />
@@ -198,53 +183,27 @@ const PsychologicalAssessment = () => {
                 </div>
               </div>
 
-              {/* Mood Level */}
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <Label className="text-base font-semibold">
-                    How would you rate your mood today?
-                  </Label>
-                  <span className="text-2xl font-bold text-secondary">
-                    {responses.moodLevel[0]}/10
-                  </span>
-                </div>
-                <Slider
-                  value={responses.moodLevel}
-                  onValueChange={(value) =>
-                    setResponses((prev) => ({ ...prev, moodLevel: value }))
-                  }
-                  min={1}
-                  max={10}
-                  step={1}
-                  className="py-4"
-                />
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Very Bad</span>
-                  <span>Excellent</span>
-                </div>
-              </div>
-
-              {/* Sleep Hours */}
+              {/* Personality Preference */}
               <div className="space-y-4">
                 <Label className="text-base font-semibold">
-                  How many hours do you sleep on average per day?
+                  Do you prefer training alone or in a social environment ?
                 </Label>
                 <RadioGroup
-                  value={responses.sleepHours}
+                  value={responses.PersonalityPreference}
                   onValueChange={(value) =>
-                    setResponses((prev) => ({ ...prev, sleepHours: value }))
+                    setResponses((prev) => ({ ...prev, PersonalityPreference: value }))
                   }
                   className="grid grid-cols-2 gap-3"
                 >
-                  {["Less than 5", "5-7 hours", "7-9 hours", "More than 9"].map(
-                    (hours) => (
+                  {["I prefer training alone", "I enjoy social or group training",].map(
+                    (PersonalityP) => (
                       <div
-                        key={hours}
+                        key={PersonalityP}
                         className="flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
                       >
-                        <RadioGroupItem value={hours} id={hours} />
-                        <Label htmlFor={hours} className="cursor-pointer">
-                          {hours}
+                        <RadioGroupItem value={PersonalityP} id={PersonalityP} />
+                        <Label htmlFor={PersonalityP} className="cursor-pointer">
+                          {PersonalityP}
                         </Label>
                       </div>
                     )
@@ -252,113 +211,8 @@ const PsychologicalAssessment = () => {
                 </RadioGroup>
               </div>
             </div>
-          )}
-
-          {currentSection === 2 && (
-            <div className="space-y-8">
-              {/* Challenges */}
-              <div className="space-y-4">
-                <Label className="text-base font-semibold">
-                  What is your biggest challenge in maintaining consistency?
-                  <span className="text-muted-foreground font-normal ml-2">
-                    (Select all that apply)
-                  </span>
-                </Label>
-                <div className="space-y-3">
-                  {[
-                    "Lack of time",
-                    "Lack of motivation",
-                    "Lack of knowledge",
-                    "Boredom with routine",
-                    "No workout partner",
-                  ].map((challenge) => (
-                    <div
-                      key={challenge}
-                      className="flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
-                      onClick={() => handleChallengeToggle(challenge)}
-                    >
-                      <Checkbox
-                        checked={responses.challenges.includes(challenge)}
-                        onCheckedChange={() => handleChallengeToggle(challenge)}
-                      />
-                      <Label className="cursor-pointer flex-1">{challenge}</Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Current Activity */}
-              <div className="space-y-4">
-                <Label className="text-base font-semibold">
-                  Do you currently practice any physical activity?
-                </Label>
-                <RadioGroup
-                  value={responses.hasActivity}
-                  onValueChange={(value) =>
-                    setResponses((prev) => ({ ...prev, hasActivity: value }))
-                  }
-                  className="flex gap-4"
-                >
-                  {["Yes", "No"].map((option) => (
-                    <div
-                      key={option}
-                      className="flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer flex-1"
-                    >
-                      <RadioGroupItem value={option} id={`activity-${option}`} />
-                      <Label
-                        htmlFor={`activity-${option}`}
-                        className="cursor-pointer"
-                      >
-                        {option}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-
-              {responses.hasActivity === "Yes" && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  className="space-y-4"
-                >
-                  <Label className="text-base font-semibold">
-                    How many times per week?
-                  </Label>
-                  <RadioGroup
-                    value={responses.activityFrequency}
-                    onValueChange={(value) =>
-                      setResponses((prev) => ({
-                        ...prev,
-                        activityFrequency: value,
-                      }))
-                    }
-                    className="grid grid-cols-4 gap-3"
-                  >
-                    {["1-2", "3-4", "5-6", "7+"].map((freq) => (
-                      <div
-                        key={freq}
-                        className="flex items-center justify-center p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer"
-                      >
-                        <RadioGroupItem
-                          value={freq}
-                          id={`freq-${freq}`}
-                          className="sr-only"
-                        />
-                        <Label
-                          htmlFor={`freq-${freq}`}
-                          className="cursor-pointer font-semibold"
-                        >
-                          {freq}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </motion.div>
-              )}
-            </div>
-          )}
-        </motion.div>
+          )}  
+        </motion.div> 
       </div>
 
       {/* Footer Navigation */}

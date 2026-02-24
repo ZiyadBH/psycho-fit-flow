@@ -103,7 +103,7 @@ const PhysicalAssessment = () => {
           className="max-w-2xl mx-auto"
         >
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Your Physical Assessment
+            Physical & Training Features
           </h1>
           <p className="text-lg text-muted-foreground mb-8">
             {sections[currentSection].title}: {sections[currentSection].description}
