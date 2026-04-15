@@ -9,8 +9,13 @@ import PsychologicalAssessment from "./pages/assessment/PsychologicalAssessment"
 import PhysicalAssessment from "./pages/assessment/PhysicalAssessment";
 import AssessmentResults from "./pages/assessment/AssessmentResults";
 import Dashboard from "./pages/dashboard/Dashboard";
+import MyPlan from "./pages/dashboard/MyPlan";
 import MoodTracker from "./pages/dashboard/MoodTracker";
 import Chatbot from "./pages/dashboard/Chatbot";
+import Workouts from "./pages/dashboard/Workouts";
+import Nutrition from "./pages/dashboard/Nutrition";
+import Reports from "./pages/dashboard/Reports";
+import Profile from "./pages/dashboard/Profile";
 import NotFound from "./pages/dashboard/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,16 +31,15 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/assessment/psychological" element={<PsychologicalAssessment />} />
           <Route path="/assessment/physical" element={<PhysicalAssessment />} />
-          {/* Preferences assessment removed; flow is Psychological -> Physical -> Results */}
           <Route path="/assessment/results" element={<AssessmentResults />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/plan" element={<MyPlan />} />
           <Route path="/dashboard/mood" element={<MoodTracker />} />
           <Route path="/dashboard/chat" element={<Chatbot />} />
-          <Route path="/dashboard/plan" element={<Dashboard />} />
-          <Route path="/dashboard/workouts" element={<Dashboard />} />
-          <Route path="/dashboard/nutrition" element={<Dashboard />} />
-          <Route path="/dashboard/reports" element={<Dashboard />} />
-          <Route path="/dashboard/profile" element={<Dashboard />} />
+          <Route path="/dashboard/workouts" element={<Workouts />} />
+          <Route path="/dashboard/nutrition" element={<Nutrition />} />
+          <Route path="/dashboard/reports" element={<Reports />} />
+          <Route path="/dashboard/profile" element={<Profile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
