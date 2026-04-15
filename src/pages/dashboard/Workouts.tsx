@@ -156,9 +156,28 @@ const programs: Record<ProgramKey, { name: string; daysPerWeek: string; descript
   },
 };
 
+// Map user goal/fitness level to a program
+const getUserProgram = (): ProgramKey => {
+  // In a real app, this would come from the database/context
+  // For now we read from a simple mapping based on fitness level
+  const storedProfile = localStorage.getItem("userProfile");
+  if (storedProfile) {
+    try {
+      const profile = JSON.parse(storedProfile);
+      if (profile.fitnessLevel === "Beginner") return "full_body";
+      if (profile.fitnessLevel === "Intermediate") return "upper_lower";
+      return "ppl";
+    } catch { /* fallback */ }
+  }
+  // Default: PPL
+  return "ppl";
+};
+
 const Workouts = () => {
-  const [selectedProgram, setSelectedProgram] = useState<ProgramKey | null>(null);
+  const userProgram = getUserProgram();
   const [selectedDay, setSelectedDay] = useState<DaySchedule | null>(null);
+
+  const program = programs[userProgram];
 
   if (selectedDay && selectedDay.type === "training" && selectedDay.exercises) {
     return (
