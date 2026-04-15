@@ -209,7 +209,47 @@ const Workouts = () => {
     );
   }
 
-  if (selectedProgram) {
+  return (
+    <DashboardLayout>
+      <div className="max-w-4xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">{program.name}</h1>
+            <p className="text-muted-foreground mt-1">{program.daysPerWeek} • Week 1</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3">
+            {program.schedule.map((day, i) => (
+              <motion.div key={day.day} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+                onClick={() => day.type === "training" ? setSelectedDay(day) : null}
+                className={`flex items-center justify-between p-5 rounded-2xl border transition-all ${
+                  day.type === "training"
+                    ? "bg-card border-border hover:border-primary/30 hover:shadow-card cursor-pointer"
+                    : "bg-muted/30 border-border"
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    day.type === "training" ? "gradient-primary text-white" : "bg-muted text-muted-foreground"
+                  }`}>
+                    {day.type === "training" ? <Dumbbell className="w-5 h-5" /> : <RotateCcw className="w-5 h-5" />}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">{day.day}</p>
+                    <p className="text-sm text-muted-foreground">{day.label}</p>
+                  </div>
+                </div>
+                {day.type === "training" && (
+                  <ArrowRight className="w-5 h-5 text-muted-foreground" />
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </DashboardLayout>
+  );
+};
     const program = programs[selectedProgram];
     return (
       <DashboardLayout>
