@@ -156,8 +156,23 @@ const programs: Record<ProgramKey, { name: string; daysPerWeek: string; descript
   },
 };
 
+// Map user fitness level to a program
+const getUserProgram = (): ProgramKey => {
+  const storedProfile = localStorage.getItem("userProfile");
+  if (storedProfile) {
+    try {
+      const profile = JSON.parse(storedProfile);
+      if (profile.fitnessLevel === "Beginner") return "full_body";
+      if (profile.fitnessLevel === "Intermediate") return "upper_lower";
+      return "ppl";
+    } catch { /* fallback */ }
+  }
+  return "ppl";
+};
+
 const Workouts = () => {
-  const [selectedProgram, setSelectedProgram] = useState<ProgramKey | null>(null);
+  const userProgram = getUserProgram();
+  const program = programs[userProgram];
   const [selectedDay, setSelectedDay] = useState<DaySchedule | null>(null);
 
   if (selectedDay && selectedDay.type === "training" && selectedDay.exercises) {
@@ -190,78 +205,41 @@ const Workouts = () => {
     );
   }
 
-  if (selectedProgram) {
-    const program = programs[selectedProgram];
-    return (
-      <DashboardLayout>
-        <div className="max-w-4xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <Button variant="ghost" className="mb-4" onClick={() => setSelectedProgram(null)}>
-              <ChevronLeft className="w-4 h-4 mr-2" /> Back to Programs
-            </Button>
-
-            <div className="mb-8">
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground">{program.name}</h1>
-              <p className="text-muted-foreground mt-1">{program.daysPerWeek} • Week 1</p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3">
-              {program.schedule.map((day, i) => (
-                <motion.div key={day.day} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
-                  onClick={() => day.type === "training" ? setSelectedDay(day) : null}
-                  className={`flex items-center justify-between p-5 rounded-2xl border transition-all ${
-                    day.type === "training"
-                      ? "bg-card border-border hover:border-primary/30 hover:shadow-card cursor-pointer"
-                      : "bg-muted/30 border-border"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      day.type === "training" ? "gradient-primary text-white" : "bg-muted text-muted-foreground"
-                    }`}>
-                      {day.type === "training" ? <Dumbbell className="w-5 h-5" /> : <RotateCcw className="w-5 h-5" />}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-foreground">{day.day}</p>
-                      <p className="text-sm text-muted-foreground">{day.label}</p>
-                    </div>
-                  </div>
-                  {day.type === "training" && (
-                    <ArrowRight className="w-5 h-5 text-muted-foreground" />
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
   return (
     <DashboardLayout>
       <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Workout Programs</h1>
-          <p className="text-muted-foreground mb-8">Choose a program that fits your schedule</p>
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">{program.name}</h1>
+            <p className="text-muted-foreground mt-1">{program.daysPerWeek} • Week 1</p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {(Object.keys(programs) as ProgramKey[]).map((key) => {
-              const p = programs[key];
-              return (
-                <motion.div key={key} whileHover={{ y: -4 }}
-                  onClick={() => setSelectedProgram(key)}
-                  className="bg-card rounded-2xl p-6 shadow-card border border-border hover:border-primary/30 cursor-pointer transition-all"
-                >
-                  <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center text-white mb-4">
-                    <Dumbbell className="w-7 h-7" />
+          <div className="grid grid-cols-1 gap-3">
+            {program.schedule.map((day, i) => (
+              <motion.div key={day.day} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+                onClick={() => day.type === "training" ? setSelectedDay(day) : null}
+                className={`flex items-center justify-between p-5 rounded-2xl border transition-all ${
+                  day.type === "training"
+                    ? "bg-card border-border hover:border-primary/30 hover:shadow-card cursor-pointer"
+                    : "bg-muted/30 border-border"
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    day.type === "training" ? "gradient-primary text-white" : "bg-muted text-muted-foreground"
+                  }`}>
+                    {day.type === "training" ? <Dumbbell className="w-5 h-5" /> : <RotateCcw className="w-5 h-5" />}
                   </div>
-                  <h3 className="text-lg font-bold text-foreground mb-1">{p.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{p.description}</p>
-                  <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">{p.daysPerWeek}</span>
-                </motion.div>
-              );
-            })}
+                  <div>
+                    <p className="font-semibold text-foreground">{day.day}</p>
+                    <p className="text-sm text-muted-foreground">{day.label}</p>
+                  </div>
+                </div>
+                {day.type === "training" && (
+                  <ArrowRight className="w-5 h-5 text-muted-foreground" />
+                )}
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </div>
