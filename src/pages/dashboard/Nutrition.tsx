@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -92,106 +93,137 @@ const mealPlans: Record<GoalKey, DayPlan> = {
   },
 };
 
-const Nutrition = () => {
-  const [selectedGoal, setSelectedGoal] = useState<GoalKey | null>(null);
-  const [expandedMeal, setExpandedMeal] = useState<number | null>(null);
+interface ResolvedGoal {
+  goal: GoalKey;
+  bmi: number | null;
+  weight: number | null;
+  reason: string;
+  hasProfile: boolean;
+}
 
-  if (selectedGoal) {
-    const plan = mealPlans[selectedGoal];
-    const info = goalInfo[selectedGoal];
+const resolveGoal = (): ResolvedGoal => {
+  const stored = localStorage.getItem("userProfile");
+  if (!stored) {
+    return { goal: "fitness", bmi: null, weight: null, reason: "No profile found", hasProfile: false };
+  }
+  try {
+    const p = JSON.parse(stored);
+    const heightM = p.height ? Number(p.height) / 100 : null;
+    const weight = p.weight ? Number(p.weight) : null;
+    const bmi = heightM && weight ? +(weight / (heightM * heightM)).toFixed(1) : null;
+    const main = String(p.mainGoal || "").toLowerCase();
+
+    if (main.includes("bulk") || main.includes("build muscle") || main.includes("muscle")) {
+      return { goal: "bulking", bmi, weight, reason: "Goal: Build Muscle", hasProfile: true };
+    }
+    if (main.includes("cut") || main.includes("lose weight") || main.includes("weight loss") || main.includes("fat loss")) {
+      return { goal: "cutting", bmi, weight, reason: "Goal: Lose Weight", hasProfile: true };
+    }
+    // Maintain / general fitness — use BMI
+    if (bmi !== null) {
+      if (bmi < 18.5) return { goal: "bulking", bmi, weight, reason: `BMI ${bmi} (Underweight) — Bulking recommended`, hasProfile: true };
+      if (bmi > 25) return { goal: "cutting", bmi, weight, reason: `BMI ${bmi} (Overweight) — Cutting recommended`, hasProfile: true };
+      return { goal: "fitness", bmi, weight, reason: `BMI ${bmi} (Healthy) — Maintain`, hasProfile: true };
+    }
+    return { goal: "fitness", bmi, weight, reason: "Maintain — General Fitness", hasProfile: true };
+  } catch {
+    return { goal: "fitness", bmi: null, weight: null, reason: "Default plan", hasProfile: false };
+  }
+};
+
+const Nutrition = () => {
+  const [expandedMeal, setExpandedMeal] = useState<number | null>(null);
+  const resolved = resolveGoal();
+
+  if (!resolved.hasProfile) {
     return (
       <DashboardLayout>
-        <div className="max-w-4xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <Button variant="ghost" className="mb-4" onClick={() => { setSelectedGoal(null); setExpandedMeal(null); }}>
-              ← Back to Goals
-            </Button>
-
-            <div className="flex items-center gap-4 mb-2">
-              <div className={`w-12 h-12 rounded-xl ${info.color} flex items-center justify-center text-white`}>{info.icon}</div>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">{info.label}</h1>
-                <p className="text-muted-foreground">{plan.totalCalories} kcal / day</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3 my-6">
-              <MacroCard label="Protein" value={plan.meals.reduce((s, m) => s + parseInt(m.protein), 0) + "g"} color="text-secondary" />
-              <MacroCard label="Carbs" value={plan.meals.reduce((s, m) => s + parseInt(m.carbs), 0) + "g"} color="text-primary" />
-              <MacroCard label="Fats" value={plan.meals.reduce((s, m) => s + parseInt(m.fats), 0) + "g"} color="text-accent" />
-            </div>
-
-            <div className="space-y-4">
-              {plan.meals.map((meal, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                  className="bg-card rounded-2xl shadow-card border border-border overflow-hidden">
-                  <div className="p-5 cursor-pointer flex items-center justify-between" onClick={() => setExpandedMeal(expandedMeal === i ? null : i)}>
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                        <Utensils className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground">{meal.name}</h3>
-                        <p className="text-sm text-muted-foreground">{meal.time} • {meal.calories} kcal</p>
-                      </div>
-                    </div>
-                    <ChevronRight className={`w-5 h-5 text-muted-foreground transition-transform ${expandedMeal === i ? "rotate-90" : ""}`} />
-                  </div>
-
-                  {expandedMeal === i && (
-                    <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} className="px-5 pb-5 border-t border-border pt-4">
-                      <div className="grid grid-cols-3 gap-3 mb-4">
-                        <MiniStat label="Protein" value={meal.protein} />
-                        <MiniStat label="Carbs" value={meal.carbs} />
-                        <MiniStat label="Fats" value={meal.fats} />
-                      </div>
-                      <div className="mb-4">
-                        <p className="text-sm font-medium text-foreground mb-2">Ingredients:</p>
-                        <ul className="space-y-1">
-                          {meal.ingredients.map((ing, j) => (
-                            <li key={j} className="text-sm text-muted-foreground flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" /> {ing}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="bg-primary/10 rounded-xl p-3">
-                        <p className="text-sm text-primary">💡 {meal.tip}</p>
-                      </div>
-                    </motion.div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+        <div className="max-w-2xl mx-auto text-center py-16">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+            <Utensils className="w-8 h-8" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Complete your assessment</h1>
+          <p className="text-muted-foreground mb-6">We need your height, weight, and goal to build your nutrition plan.</p>
+          <Link to="/assessment/physical">
+            <Button>Start Assessment</Button>
+          </Link>
         </div>
       </DashboardLayout>
     );
   }
 
+  const plan = mealPlans[resolved.goal];
+  const info = goalInfo[resolved.goal];
+
   return (
     <DashboardLayout>
       <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Nutrition Plans</h1>
-          <p className="text-muted-foreground mb-8">Choose a plan based on your goal</p>
+          <div className="flex items-center gap-4 mb-3">
+            <div className={`w-12 h-12 rounded-xl ${info.color} flex items-center justify-center text-white`}>{info.icon}</div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">{info.label}</h1>
+              <p className="text-muted-foreground">{plan.totalCalories} kcal / day · This week's plan</p>
+            </div>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {(Object.keys(goalInfo) as GoalKey[]).map((key) => {
-              const g = goalInfo[key];
-              const plan = mealPlans[key];
-              return (
-                <motion.div key={key} whileHover={{ y: -4 }}
-                  onClick={() => setSelectedGoal(key)}
-                  className="bg-card rounded-2xl p-6 shadow-card border border-border hover:border-primary/30 cursor-pointer transition-all"
-                >
-                  <div className={`w-14 h-14 rounded-xl ${g.color} flex items-center justify-center text-white mb-4`}>{g.icon}</div>
-                  <h3 className="text-lg font-bold text-foreground mb-1">{g.label}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{g.description}</p>
-                  <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">{plan.totalCalories} kcal/day</span>
-                </motion.div>
-              );
-            })}
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 mb-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+            {resolved.bmi !== null && (
+              <span className="text-foreground"><span className="font-semibold">BMI:</span> {resolved.bmi}</span>
+            )}
+            {resolved.weight !== null && (
+              <span className="text-foreground"><span className="font-semibold">Weight:</span> {resolved.weight} kg</span>
+            )}
+            <span className="text-primary">· {resolved.reason}</span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            <MacroCard label="Protein" value={plan.meals.reduce((s, m) => s + parseInt(m.protein), 0) + "g"} color="text-secondary" />
+            <MacroCard label="Carbs" value={plan.meals.reduce((s, m) => s + parseInt(m.carbs), 0) + "g"} color="text-primary" />
+            <MacroCard label="Fats" value={plan.meals.reduce((s, m) => s + parseInt(m.fats), 0) + "g"} color="text-accent" />
+          </div>
+
+          <div className="space-y-4">
+            {plan.meals.map((meal, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                className="bg-card rounded-2xl shadow-card border border-border overflow-hidden">
+                <div className="p-5 cursor-pointer flex items-center justify-between" onClick={() => setExpandedMeal(expandedMeal === i ? null : i)}>
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                      <Utensils className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">{meal.name}</h3>
+                      <p className="text-sm text-muted-foreground">{meal.time} • {meal.calories} kcal</p>
+                    </div>
+                  </div>
+                  <ChevronRight className={`w-5 h-5 text-muted-foreground transition-transform ${expandedMeal === i ? "rotate-90" : ""}`} />
+                </div>
+
+                {expandedMeal === i && (
+                  <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} className="px-5 pb-5 border-t border-border pt-4">
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                      <MiniStat label="Protein" value={meal.protein} />
+                      <MiniStat label="Carbs" value={meal.carbs} />
+                      <MiniStat label="Fats" value={meal.fats} />
+                    </div>
+                    <div className="mb-4">
+                      <p className="text-sm font-medium text-foreground mb-2">Ingredients:</p>
+                      <ul className="space-y-1">
+                        {meal.ingredients.map((ing, j) => (
+                          <li key={j} className="text-sm text-muted-foreground flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" /> {ing}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="bg-primary/10 rounded-xl p-3">
+                      <p className="text-sm text-primary">💡 {meal.tip}</p>
+                    </div>
+                  </motion.div>
+                )}
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </div>
