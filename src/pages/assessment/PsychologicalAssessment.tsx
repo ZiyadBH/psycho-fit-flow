@@ -12,6 +12,7 @@ import { ArrowLeft, ArrowRight, Brain } from "lucide-react";
 const PsychologicalAssessment = () => {
   const navigate = useNavigate();
   const [currentSection, setCurrentSection] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   const [responses, setResponses] = useState({
     EnergyLevel: "",
@@ -33,14 +34,29 @@ const PsychologicalAssessment = () => {
   ];
 
   const handleNext = () => {
+    setError(null);
+    if (currentSection === 0) {
+      if (!responses.EnergyLevel || !responses.MotivationLevel) {
+        setError("Please answer all questions before proceeding.");
+        return;
+      }
+    } else if (currentSection === 1) {
+      if (!responses.PersonalityPreference || !responses.Discipline) {
+        setError("Please answer all questions before proceeding.");
+        return;
+      }
+    }
+
     if (currentSection < sections.length - 1) {
       setCurrentSection(currentSection + 1);
     } else {
+      localStorage.setItem("psychologicalResponses", JSON.stringify(responses));
       navigate("/assessment/physical");
     }
   };
 
   const handleBack = () => {
+    setError(null);
     if (currentSection > 0) {
       setCurrentSection(currentSection - 1);
     } else {
@@ -245,6 +261,11 @@ const PsychologicalAssessment = () => {
 
       {/* Footer Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-lg border-t border-border">
+        {error && (
+          <div className="bg-destructive/10 text-destructive text-center py-2 text-sm font-medium border-b border-destructive/20">
+            {error}
+          </div>
+        )}
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center max-w-2xl mx-auto">
             <Button variant="ghost" onClick={handleBack}>

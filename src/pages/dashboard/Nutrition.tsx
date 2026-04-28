@@ -104,7 +104,7 @@ interface ResolvedGoal {
 const resolveGoal = (): ResolvedGoal => {
   const stored = localStorage.getItem("userProfile");
   if (!stored) {
-    return { goal: "fitness", bmi: null, weight: null, reason: "No profile found", hasProfile: false };
+    return { goal: "fitness", bmi: null, weight: null, reason: "Default Plan", hasProfile: false };
   }
   try {
     const p = JSON.parse(stored);
@@ -135,22 +135,6 @@ const Nutrition = () => {
   const [expandedMeal, setExpandedMeal] = useState<number | null>(null);
   const resolved = resolveGoal();
 
-  if (!resolved.hasProfile) {
-    return (
-      <DashboardLayout>
-        <div className="max-w-2xl mx-auto text-center py-16">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-4">
-            <Utensils className="w-8 h-8" />
-          </div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">Complete your assessment</h1>
-          <p className="text-muted-foreground mb-6">We need your height, weight, and goal to build your nutrition plan.</p>
-          <Link to="/assessment/physical">
-            <Button>Start Assessment</Button>
-          </Link>
-        </div>
-      </DashboardLayout>
-    );
-  }
 
   const plan = mealPlans[resolved.goal];
   const info = goalInfo[resolved.goal];
