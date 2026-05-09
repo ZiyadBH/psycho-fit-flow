@@ -17,8 +17,14 @@ import Nutrition from "./pages/dashboard/Nutrition";
 import Reports from "./pages/dashboard/Reports";
 import Profile from "./pages/dashboard/Profile";
 import NotFound from "./pages/dashboard/NotFound";
+import { AuthProvider } from "./hooks/useAuth";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
+
+const Protected = ({ children }: { children: React.ReactNode }) => (
+  <ProtectedRoute>{children}</ProtectedRoute>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -26,23 +32,25 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/assessment/psychological" element={<PsychologicalAssessment />} />
-          <Route path="/assessment/physical" element={<PhysicalAssessment />} />
-          <Route path="/assessment/results" element={<AssessmentResults />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/plan" element={<MyPlan />} />
-          <Route path="/dashboard/mood" element={<MoodTracker />} />
-          <Route path="/dashboard/chat" element={<Chatbot />} />
-          <Route path="/dashboard/workouts" element={<Workouts />} />
-          <Route path="/dashboard/nutrition" element={<Nutrition />} />
-          <Route path="/dashboard/reports" element={<Reports />} />
-          <Route path="/dashboard/profile" element={<Profile />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/assessment/psychological" element={<Protected><PsychologicalAssessment /></Protected>} />
+            <Route path="/assessment/physical" element={<Protected><PhysicalAssessment /></Protected>} />
+            <Route path="/assessment/results" element={<Protected><AssessmentResults /></Protected>} />
+            <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
+            <Route path="/dashboard/plan" element={<Protected><MyPlan /></Protected>} />
+            <Route path="/dashboard/mood" element={<Protected><MoodTracker /></Protected>} />
+            <Route path="/dashboard/chat" element={<Protected><Chatbot /></Protected>} />
+            <Route path="/dashboard/workouts" element={<Protected><Workouts /></Protected>} />
+            <Route path="/dashboard/nutrition" element={<Protected><Nutrition /></Protected>} />
+            <Route path="/dashboard/reports" element={<Protected><Reports /></Protected>} />
+            <Route path="/dashboard/profile" element={<Protected><Profile /></Protected>} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
